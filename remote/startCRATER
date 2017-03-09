@@ -23,7 +23,7 @@ fi
 
 case "$1" in
 	start)
-		if [[ ! -e /var/run/CRATER.pid ]]; then
+		if [ ! -f /var/run/CRATER.pid ]; then
 			echo "Starting CRATER"
 			/usr/sbin/listenerSB.py > /dev/null &
 			echo $! > /var/run/CRATER.pid
@@ -39,8 +39,8 @@ case "$1" in
 		echo $! > /var/run/CRATER.pid
 		;;
 	status)
-		if [[ -e /var/run/CRATER.pid ]]; then
-			if [[ ps -p $(cat /var/run/CRATER.pid) > /dev/null ]]; then
+		if [ -f /var/run/CRATER.pid ]; then
+			if [ ps -p $(cat /var/run/CRATER.pid) > /dev/null ]; then
 				exit 0
 			else
 				exit 1
