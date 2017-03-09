@@ -32,7 +32,7 @@ matrix_L = numpy.matrix('25   30   40   50   50    50    55    60    60    65   
 			 40   60   80   100  100   100   90    90    90    100   100;\
 			 50   50   50   50   50    100   90    90    90    100   100')
 
-os.system('sudo ./servod --min=1000us --max=2000us --p1pins=0,0,12,0,0,16')
+# os.system('sudo ./servod --min=1000us --max=2000us --p1pins=0,0,12,0,0,16')
 # Left motor = 2
 # Right motor = 5
 
@@ -41,6 +41,8 @@ os.system('sudo ./servod --min=1000us --max=2000us --p1pins=0,0,12,0,0,16')
 
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(('',12000))
+
+logfile = open('/tmp/CRATER.log', 'w')
 
 #2 = GPIO 18, 5 = GPIO 23
 
