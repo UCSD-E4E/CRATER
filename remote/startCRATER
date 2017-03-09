@@ -1,28 +1,53 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides: CRATER
-# Required-Start: $remote_fs $syslog $dhcpcd
+# Required-Start: $remote_fs $syslog servoblaster
 # Required-Stop: $remote_fs $syslog
+# Should-Start:
 # Default-Start: 2 3 4 5
 # Default-Stop: 
 # Short-Description: CRATER
+# Description:       This script starts/stops CRATER.
 ### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+. /lib/init/vars.sh
+
+STATUSFILE="/tmp/CRATER-status"
+
+if [ $( id -u ) != 0 ]; then
+	echo "ERROR: Must be run as root"
+	exit 1
+fi
+
 
 case "$1" in
 	start)
-		echo "Starting CRATER"
-		/home/pi/CRATER/listener.py &
+		if [[ ! -e /var/run/CRATER.pid ]]; then
+			echo "Starting CRATER"
+			/usr/sbin/listenerSB.py > /dev/null &
+			echo $! > /var/run/CRATER.pid
+		fi
 		;;
 	stop)
-		pkill python
+		kill $(cat /var/run/CRATER.pid)
+		rm /var/run/CRATER.pid
 		;;
-	reload|force-reload)
-		pkill python
-		/home/pi/CRATER/listener.py &
+	restart|reload)
+		kill $(cat /var/run/CRATER.pid)
+		/usr/sbin/listenerSB.py > /dev/null &
+		echo $! > /var/run/CRATER.pid
 		;;
-	restart|try-restart)
-		pkill python
-		/home/pi/CRATER/listener.py &
+	status)
+		if [[ -e /var/run/CRATER.pid ]]; then
+			if [[ ps -p $(cat /var/run/CRATER.pid) > /dev/null ]]; then
+				exit 0
+			else
+				exit 1
+			fi
+		else
+			exit 3
+		fi
 		;;
 esac
 
