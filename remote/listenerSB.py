@@ -54,9 +54,13 @@ def control_motor(data):
     pwmL = matrix_L[idx_x, idx_y]
     pwmR = matrix_R[idx_x, idx_y]
 
-    os.system("echo 2=" + str(pwmL) + "% > /dev/servoblaster")
-    os.system("echo 5=" + str(pwmR) + "% > /dev/servoblaster")
-    #os.system("echo 2=10% > /dev/servoblaster")
+    servoblasterfile = open('/dev/servoblaster', 'w')
+    servoblasterfile.write('2=%d%%' % pwmL)
+    logfile.write('2=%d%%' % pwmL)
+    logfile.flush()
+    servoblasterfile.flush()
+    servoblasterfile.write('5=%d%%' % pwmR)
+    servoblasterfile.flush()
     time.sleep(0.02)
 
 def control_payload(data):
