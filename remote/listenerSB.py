@@ -58,11 +58,13 @@ def control_motor(data):
     pwmL = matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000
     pwmR = matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000
 
-    servoblasterfile.write('2=%d' % pwmL)
-    logfile.write('2=%d' % pwmL)
+    pwmLmsg = '2=%d\n' % pwmL
+    pwmRmsg = '5=%d\n' % pwmR
+    servoblasterfile.write(pwmLmsg)
+    logfile.write(pwmLmsg)
     logfile.flush()
     servoblasterfile.flush()
-    servoblasterfile.write('5=%d' % pwmR)
+    servoblasterfile.write('5=%d' % pwmRmsg)
     servoblasterfile.flush()
     time.sleep(0.02)
 
