@@ -46,6 +46,7 @@ serverSocket.bind(('',12000))
 logfile = open('/tmp/CRATER.log', 'w')
 
 #2 = GPIO 18, 5 = GPIO 23
+servoblasterfile = open('/dev/servoblaster', 'w')
 
 def control_motor(data):
     x = data['X']
@@ -54,15 +55,14 @@ def control_motor(data):
     idx_x = math.floor((5*x) + 5)
     idx_y = math.floor((-5*y) + 5)
 
-    pwmL = matrix_L[idx_x, idx_y]
-    pwmR = matrix_R[idx_x, idx_y]
+    pwmL = matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000
+    pwmR = matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000
 
-    servoblasterfile = open('/dev/servoblaster', 'w')
-    servoblasterfile.write('2=%d%%' % pwmL)
-    logfile.write('2=%d%%' % pwmL)
+    servoblasterfile.write('2=%d' % pwmL)
+    logfile.write('2=%d' % pwmL)
     logfile.flush()
     servoblasterfile.flush()
-    servoblasterfile.write('5=%d%%' % pwmR)
+    servoblasterfile.write('5=%d' % pwmR)
     servoblasterfile.flush()
     time.sleep(0.02)
 
