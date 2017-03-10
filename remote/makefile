@@ -1,12 +1,13 @@
 .PHONY: install clean
 
-install: listenerSB.py
-	cp startCRATER /etc/init.d/
-	update-rc.d startCRATER defaults
-	cp listenerSB.py /usr/sbin/listenerSB.py
-	chmod +x /usr/sbin/listenerSB.py
+install: listenerSB.py init-script
+	cp init-script /etc/init.d/CRATER
+	chmod +x /etc/init.d/CRATER
+	update-rc.d CRATER defaults
+	cp listenerSB.py /usr/sbin/CRATER
+	chmod +x /usr/sbin/CRATER
 
 uninstall:
-	-rm /usr/sbin/listenerSB.py
-	-update-rc.d startCRATER remove
-	-rm /etc/init.d/startCRATER
+	-rm /usr/sbin/CRATER
+	-update-rc.d CRATER remove
+	-rm /etc/init.d/CRATER
