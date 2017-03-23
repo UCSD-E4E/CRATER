@@ -33,6 +33,25 @@ matrix_L = numpy.matrix('25   30   40   50   50    50    55    60    60    65   
 			 40   60   80   100  100   100   90    90    90    100   100;\
 			 50   50   50   50   50    100   90    90    90    100   100')
 
+inKsize = len(matrix_L)
+outKsize = 101
+
+kernelOut = numpy.zeros((outKsize, outKsize), numpy.uint8)
+
+z_L = matrix_L
+z_R = matrix_R
+
+x = numpy.arange(11)
+y = numpy.arange(11)
+
+xx = numpy.linspace(x.min(), x.max(), outKsize)
+yy = numpy.linspace(y.min(), y.max(), outKsize)
+
+newKernel_L = interpolate.RectBivariateSpline(x, y, z_L)
+matrix_L = newKernel_L(xx, yy)
+newKernel_R = interpolate.RectBivariateSpline(x, y, z_R)
+matrix_R = newKernel_R(xx, yy)
+print(matrix_L)
 # os.system('sudo ./servod --min=1000us --max=2000us --p1pins=0,0,12,0,0,16')
 # Left motor = 2
 # Right motor = 5
@@ -79,8 +98,8 @@ def control_motor(data):
 
     print(ticker)
 
-    idx_x = math.floor((5*x) + 5)
-    idx_y = math.floor((-5*y) + 5)
+    idx_x = math.floor((50*x) + 50)
+    idx_y = math.floor((-50*y) + 50)
 
     #50us corrections
     if ticker > 0: # Want more right, so add to left motor
@@ -97,8 +116,8 @@ def control_motor(data):
 	offsetL = 0
 	offsetR = 0
 
-    pwmL = (matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetL
-    pwmR = (matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetR
+    pwmL = math.floor((matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetL)
+    pwmR = math.floor((matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetR)
 
     print("pwmL ", pwmL)
     print("pwmR ", pwmR)
