@@ -43,6 +43,12 @@ matrix_L = numpy.matrix('25   30   40   50   50    50    55    60    60    65   
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(('',12000))
 
+ticker = 0
+flag = 0
+flag_t = 0
+offsetR = 0
+offsetL = 0
+
 logfile = open('/tmp/CRATER.log', 'w')
 
 #2 = GPIO 18, 5 = GPIO 23
@@ -51,12 +57,51 @@ servoblasterfile = open('/dev/servoblaster', 'w')
 def control_motor(data):
     x = data['X']
     y = data['Y']
+    l = data['L']
+    r = data['R']
+    a = data['A']
+    global flag_t
+    global flag
+    global ticker
+
+    if l == 1 and ticker > -5 and flag == 0:
+	flag_t = time.time()
+	flag = 1
+	ticker = ticker - 1 
+	
+    if r == 1 and ticker < 5 and flag == 0:
+	flag_t = time.time()
+	flag = 1
+	ticker = ticker + 1
+
+    if time.time() > flag_t + 1:
+	flag = 0
+
+    print(ticker)
 
     idx_x = math.floor((5*x) + 5)
     idx_y = math.floor((-5*y) + 5)
 
-    pwmL = matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000
-    pwmR = matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000
+    #50us corrections
+    if ticker > 0: # Want more right, so add to left motor
+	offsetL = ticker * 50
+	offsetR = 0
+    if ticker < 0: # Want more left, so dd to right motor
+	offsetR = ticker * 50
+	offsetL = 0
+    if ticker == 0:
+	offsetL = 0
+	offsetR = 0
+    if a == 1:
+	ticker = 0
+	offsetL = 0
+	offsetR = 0
+
+    pwmL = (matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetL
+    pwmR = (matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetR
+
+    print("pwmL ", pwmL)
+    print("pwmR ", pwmR)
 
     pwmLmsg = '2=%dus\n' % pwmL
     pwmRmsg = '5=%dus\n' % pwmR
@@ -66,6 +111,28 @@ def control_motor(data):
     servoblasterfile.flush()
     servoblasterfile.write(pwmRmsg)
     servoblasterfile.flush()
+#    if A == 1:
+#	global flag_on
+#	flag_on = 1
+#	print("A is 1")
+ #   if B == 1:
+#	global flag_on
+#	flag_on = 0
+#	print("B is 1")
+
+ #   if flag_on==1:
+#	print("FLAG ON WRITING")
+ #   	servoblasterfile.write('2=1750us\n')
+  #      servoblasterfile.flush()
+   # 	servoblasterfile.write('5=1750us\n')
+#	servoblasterfile.flush()
+ #   elif flag_on==0:
+#	print("FLAG OFF WRITING")
+ #   	servoblasterfile.write('2=1500us\n')
+#	servoblasterfile.flush()
+ #   	servoblasterfile.write('5=1500us\n')
+#	servoblasterfile.flush()
+ #   print ('%d\n' % flag_on)
     time.sleep(0.02)
 
 def control_payload(data):
@@ -88,9 +155,9 @@ def main():
         message, address = serverSocket.recvfrom(1024)
         message = message.upper()
 
-        print(message)
-
+        #print(message)
         data = json.loads(message)
+	#print(data['L'])     
         control_motor(data)
         control_payload(data)
 
