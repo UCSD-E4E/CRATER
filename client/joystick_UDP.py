@@ -151,18 +151,26 @@ while done==False:
         #Right Trigger        5
 	vector = '{ "x":'+'{}'.format( joystick.get_axis( 3 ) )
 	vector += ',"y":'+'{}'.format( joystick.get_axis( 4 ) )
-	vector += ',"a":'+'{}'.format(joystick.get_button( 0 )) + ' }'
+	vector += ',"a":'+'{}'.format(joystick.get_button( 0 ))
+	vector += ',"b":'+'{}'.format(joystick.get_button( 1 ))
+	vector += ',"l":'+'{}'.format(joystick.get_button( 4 ))
+	vector += ',"r":'+'{}'.format(joystick.get_button( 5 ))
+        vector += ' }'
         
 
         #Logitech GamePad F710
         #Buttons in Use
         #A = joystick.get_button( 0 )
+	#B = joystick.get_button( 1 )
+	#x_btn = joystick.get_button( 2 )
+	#y_btn = joystick.get_button( 3 )
+	
 
 
 	clientSocket = socket( AF_INET, SOCK_DGRAM)
 	clientSocket.settimeout(1)
 	message = vector
-	addr = ("169.254.43.92", 12000)
+	addr = ("192.168.2.104", 12000)
 
 	start = time.time()
 	clientSocket.sendto(message, addr)
