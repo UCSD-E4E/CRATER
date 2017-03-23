@@ -1,4 +1,3 @@
-
 #define RELAY4 13
 #define RELAY3 12
 #define RELAY2 11
@@ -6,8 +5,11 @@
 
 #define LOCK_VALVES -1
 
+#define ON HIGH
+#define OFF LOW
 
 
+#define TRIGGER_DELAY 8000
 
 #define COLLECTION_DELAY 8000             // Use Collection Delay to adjust the time valves are open
 
@@ -15,11 +17,14 @@
 
 
 
-
 //String readString;
 int max_offset;
 int offset;
 int current_relay;
+
+//Used to block polling
+long seconds;
+long current_time;
 
 
 void setup()
@@ -29,12 +34,17 @@ void setup()
   
   offset = 0;
   
-  while( offset <  max_offset ){
+  while( offset <  MAX_VALVES ){
+
+    current_relay = RELAY1 + offset;
     
-    pinMode(RELAY1 + offset, OUTPUT);
+    pinMode( current_relay, OUTPUT);
+    
     offset++;
     
   }
+   
+  seconds = 0; 
   
   //pinMode(RELAY2, OUTPUT);
   //pinMode(RELAY3, OUTPUT);
@@ -65,25 +75,34 @@ void loop() {
         
         if(c == 'N' && offset != LOCK_VALVES ){        //Open next valve in series
           
-  
-          current_relay = RELAY1+offset;
-          digitalWrite( current_relay, LOW);              // Turns ON the current Relay
-          delay( COLLECTION_DELAY );
-          digitalWrite( current_relay, HIGH);  
-          offset++;
-
-
-          if( offset > max_offset ){
-            offset = LOCK_VALVES; // Lock all valves
-          }
+          //Check to be sure the next collection signal isn't to soon.
+          current_time = millis();
+          long time_difference = current_time - seconds; 
           
+          if( time_difference > TRIGGER_DELAY ){
+            
+            current_relay = RELAY1+offset;
+            digitalWrite( current_relay, ON );              // Turns ON the current Relay
+            delay( COLLECTION_DELAY );
+            digitalWrite( current_relay, OFF );  
+            offset++;
+
+            //Reset the delay difference
+            seconds = millis();
+
+            
+            if( offset > max_offset ){
+              offset = LOCK_VALVES; // Lock all valves
+            }
+            
+          }
           
         }else if( c == 'R' ){                           //Close all Valves
           
           offset = 0;
           while( offset < MAX_VALVES ){
             current_relay = RELAY1 + offset;
-            digitalWrite( current_relay, HIGH);               // Turns OFF all Relays
+            digitalWrite( current_relay, OFF );               // Turns OFF all Relays
             delay(10);
             offset++;
           }
@@ -95,7 +114,7 @@ void loop() {
           while( offset < MAX_VALVES ){
             current_relay = RELAY1 + offset;
             
-            digitalWrite( current_relay, LOW);              // Turns ON all Relays
+            digitalWrite( current_relay, ON );              // Turns ON all Relays
             delay(10);
             offset++;
           }
@@ -107,6 +126,5 @@ void loop() {
   
   
 }
-
 
 
