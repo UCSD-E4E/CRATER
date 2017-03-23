@@ -59,7 +59,7 @@ def control_motor(data):
     y = data['Y']
     l = data['L']
     r = data['R']
-    a = data['A']
+    y = data['Y_BTN']
     global flag_t
     global flag
     global ticker
@@ -92,7 +92,7 @@ def control_motor(data):
     if ticker == 0:
 	offsetL = 0
 	offsetR = 0
-    if a == 1:
+    if y == 1:
 	ticker = 0
 	offsetL = 0
 	offsetR = 0
@@ -111,44 +111,36 @@ def control_motor(data):
     servoblasterfile.flush()
     servoblasterfile.write(pwmRmsg)
     servoblasterfile.flush()
-#    if A == 1:
-#	global flag_on
-#	flag_on = 1
-#	print("A is 1")
- #   if B == 1:
-#	global flag_on
-#	flag_on = 0
-#	print("B is 1")
-
- #   if flag_on==1:
-#	print("FLAG ON WRITING")
- #   	servoblasterfile.write('2=1750us\n')
-  #      servoblasterfile.flush()
-   # 	servoblasterfile.write('5=1750us\n')
-#	servoblasterfile.flush()
- #   elif flag_on==0:
-#	print("FLAG OFF WRITING")
- #   	servoblasterfile.write('2=1500us\n')
-#	servoblasterfile.flush()
- #   	servoblasterfile.write('5=1500us\n')
-#	servoblasterfile.flush()
- #   print ('%d\n' % flag_on)
     time.sleep(0.02)
 
 def control_payload(data):
-    a = data['A']
 
-    if( a == 1 ):
-        command = 'H'
-    else:
-        command = 'L'
+    a = data['A_BTN']
+    b = data['B_BTN']
+    x = data['X_BTN']
+    y = data['Y_BTN']
+    
+    command = 'POLLING'
+    
+    #Open All Valves
+    if ( a == 1 and b == 0 and x == 1 and y == 0 ):
+        command = 'A'
+        ser.write(command)
+        print('Open All Valves')
+    
+    #Close All Valves & Reset Counter
+    elif ( a == 0 and b == 1 and x == 0 and y == 1 ):
+        command = 'R'
+        ser.write(command)
+        print('Close All Valves and Reset')
+    
+    #Open Next Valve
+    elif ( a == 1 and b == 0 and x == 0 and y == 0 ):
+        command = 'N'
+        ser.write(command)
+        print('Open Next Valve')
 
-    #ser.write(command)
 
-    #if command == 'H':
-        #print('Led on')
-    #elif command == 'L':
-        #print('Led off')
 
 def main():
     while True:

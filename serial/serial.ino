@@ -1,0 +1,112 @@
+
+#define RELAY4 13
+#define RELAY3 12
+#define RELAY2 11
+#define RELAY1 10
+
+#define LOCK_VALVES -1
+
+
+
+
+#define COLLECTION_DELAY 8000             // Use Collection Delay to adjust the time valves are open
+
+#define MAX_VALVES 2                      // Use max valves to adjust the system size
+
+
+
+
+//String readString;
+int max_offset;
+int offset;
+int current_relay;
+
+
+void setup()
+{
+
+  max_offset = MAX_VALVES - 1;
+  
+  offset = 0;
+  
+  while( offset <  max_offset ){
+    
+    pinMode(RELAY1 + offset, OUTPUT);
+    offset++;
+    
+  }
+  
+  //pinMode(RELAY2, OUTPUT);
+  //pinMode(RELAY3, OUTPUT);
+  //pinMode(RELAY4, OUTPUT);
+  
+  // initialize serial communications at 9600 bps
+  Serial.begin(9600);             
+
+
+  offset = 0;
+  current_relay = 0;  
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  
+    delay(100);
+  
+    
+      if ( Serial.available() ){
+  
+        
+        char c = Serial.read();  //gets one byte from serial buffer
+        //readString += c; //makes the string readString
+              
+
+        
+        if(c == 'N' && offset != LOCK_VALVES ){        //Open next valve in series
+          
+  
+          current_relay = RELAY1+offset;
+          digitalWrite( current_relay, LOW);              // Turns ON the current Relay
+          delay( COLLECTION_DELAY );
+          digitalWrite( current_relay, HIGH);  
+          offset++;
+
+
+          if( offset > max_offset ){
+            offset = LOCK_VALVES; // Lock all valves
+          }
+          
+          
+        }else if( c == 'R' ){                           //Close all Valves
+          
+          offset = 0;
+          while( offset < MAX_VALVES ){
+            current_relay = RELAY1 + offset;
+            digitalWrite( current_relay, HIGH);               // Turns OFF all Relays
+            delay(10);
+            offset++;
+          }
+          
+          offset = 0;
+          
+        }else if( c == 'A' ){                          //Open All Valves
+          offset = 0;
+          while( offset < MAX_VALVES ){
+            current_relay = RELAY1 + offset;
+            
+            digitalWrite( current_relay, LOW);              // Turns ON all Relays
+            delay(10);
+            offset++;
+          }
+        }
+
+        
+        
+     }
+  
+  
+}
+
+
+
