@@ -49,9 +49,11 @@ kernelOut = newKernel(xx, yy)
 #print (kernelOut)
 
 p = len(kernelOut)
-for i in range(5):
+#for i in range(5):
 #	print(row)
-	print kernelOut[i]
+#	print kernelOut[i]
+#	file.write(kernelOut[i])
 
 numpy.savetxt(file, kernelOut)
 file.close()
+print(kernelOut)
