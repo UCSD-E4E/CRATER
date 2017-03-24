@@ -22,6 +22,9 @@ To pull up the camera stream:
 Open up a browser and go to address:
 192.168.2.104:8080/stream
 
+I added a bash script to run these three things in order
+to run type in: bash /home/connie/start.sh
+
 REMOTE:
 Everything should be started on boot:
 
