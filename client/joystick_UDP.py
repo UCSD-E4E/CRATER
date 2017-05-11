@@ -151,6 +151,8 @@ while done==False:
         #Right Trigger        5
 	vector = '{ "x":'+'{}'.format( joystick.get_axis( 3 ) )
 	vector += ',"y":'+'{}'.format( joystick.get_axis( 4 ) )
+	vector += ',"turn":'+'{}'.format( joystick.get_axis( 0 ) )
+
 	vector += ',"a_btn":'+'{}'.format(joystick.get_button( 0 ))
 	vector += ',"b_btn":'+'{}'.format(joystick.get_button( 1 ))
 	vector += ',"x_btn":'+'{}'.format(joystick.get_button( 2 ))

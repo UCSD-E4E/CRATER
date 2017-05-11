@@ -85,6 +85,9 @@ def control_motor(data):
     l = data['L']
     r = data['R']
     y_btn = data['Y_BTN']
+
+    turn = data['TURN']
+
     global flag_t
     global flag
     global ticker
@@ -131,9 +134,17 @@ def control_motor(data):
 
     if r == 1 and l == 1:
 	flagCruise = 1
-	offsetL = 100
-	offsetR = 100
+	offsetL = 130
+	offsetR = 130
 	ticker = 6
+
+    if( turn == 1 )
+    	offsetL = 180
+    	offsetR = -180
+
+    if( turn == 0 )
+	offsetL = -180
+	offsetR = 180
 
     pwmL = math.floor((matrix_L[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetL)
     pwmR = math.floor((matrix_R[idx_x, idx_y] / 100.0 * 1000 + 1000) + offsetR)
